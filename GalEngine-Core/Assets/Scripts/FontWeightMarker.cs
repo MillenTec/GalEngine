@@ -1,8 +1,7 @@
 using UnityEngine;
 
-public enum FontWeightType { Bold, Light, Medium } // 定义你需要的样式
+public enum FontWeightType { Bold, Light, Medium }
 
-public class FontWeightMarker : MonoBehaviour
-{
+public class FontWeightMarker : MonoBehaviour {
     public FontWeightType weight = FontWeightType.Medium;
 }

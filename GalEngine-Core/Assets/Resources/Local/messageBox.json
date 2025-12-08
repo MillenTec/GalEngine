@@ -1,0 +1,20 @@
+﻿{
+  "zh-cn": {
+    "DevelopingWindow": {
+      "title": "很快了！",
+      "message": "功能还在开发中\n很快就会到来"
+    }
+  },
+  "en-us": {
+    "DevelopingWindow": {
+      "title": "Coming Soon",
+      "message": "The feature is still under development and will be available soon."
+    }
+  },
+  "ja-jp": {
+    "DevelopingWindow": {
+      "title": "すぐに来ます",
+      "message": "機能はまだ開発中です\nまもなく利用できるようになります"
+    }
+  }
+}

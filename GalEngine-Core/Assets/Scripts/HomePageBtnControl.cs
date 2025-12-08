@@ -1,14 +1,21 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 
 public class HomePageBtnControl : MonoBehaviour {
-    public CanvasGroup developingWindow;
     public TextMeshProUGUI testText;
+
+    public CanvasGroup messageBox;
+    private MessageBoxController _messageBoxController;
     
     private void Awake() {
         Application.targetFrameRate = 120;
+        _messageBoxController = messageBox.GetComponent<MessageBoxController>();
+        if (_messageBoxController == null) {
+            _messageBoxController = messageBox.AddComponent<MessageBoxController>();
+        }
     }
 
     private void Start() {
@@ -32,45 +39,13 @@ public class HomePageBtnControl : MonoBehaviour {
         SceneManager.LoadScene("Gaming");
     }
 
-    private IEnumerator CanvasFadeIn(CanvasGroup canvas, float speed) {
-        canvas.blocksRaycasts = true;
-        float time = 0f;
-        float startAlpha = 0f;
-        float endAlpha = 1f;
-
-        while (time <= speed) {
-            time += Time.deltaTime;
-            float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, time / speed);
-            canvas.alpha = currentAlpha;
-            yield return null;
-        }
-
-        canvas.alpha = 1f;
-    }
-
-    private IEnumerator CanvasFadeOut(CanvasGroup canvas, float speed) {
-        float time = 0f;
-        float startAlpha = 1f;
-        float endAlpha = 0f;
-
-        while (time <= speed) {
-            time += Time.deltaTime;
-            float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, time / speed);
-            canvas.alpha = currentAlpha;
-            yield return null;
-        }
-
-        canvas.alpha = 0f;
-        canvas.blocksRaycasts = false;
-    }
-
-
     public void IsClickDevelopingWindow() {
-        StartCoroutine(CanvasFadeIn(developingWindow, 0.1f));
+        _messageBoxController.MessageBox("Coming Soon", "马上就会来到", MessageBoxType.OnlyOk);
     }
 
-    public void IsCloseDevelopingWindow() {
-        StartCoroutine(CanvasFadeOut(developingWindow, 0.1f));
+    IEnumerator WaitMessageBoxOkButtonClick() {
+        while (!_messageBoxController.isOkButtonClick) yield return null;
+        _messageBoxController.CloseMessageBox();
     }
 
     public void ClickCloseButton() {

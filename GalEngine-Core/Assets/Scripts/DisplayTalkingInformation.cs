@@ -20,10 +20,10 @@ public class DisplayTalkingInformation : MonoBehaviour {
     public TextMeshProUGUI choicesBox2Text;
     public TextMeshProUGUI choicesBox3Text;
     public TextMeshProUGUI choicesBox4Text;
-
-    private bool _isChoosing = false;
+    
     private TextAsset _jsonData;
-    private int ?_ordinalNumber = null;
+    private int? _ordinalNumber = null;
+
     private JArray _plotJsonData;
     private bool _isInTextOutput; // 用于显示是否处于逐字输出迭代器中，为了使跳过判定迭代器拥有退出条件
     private bool _isNextOrSkipKeyDown; // 用于检测空格或向下键是否按下
@@ -43,14 +43,10 @@ public class DisplayTalkingInformation : MonoBehaviour {
 
     private void Update() {
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.DownArrow)) {
-            if (!_isChoosing) {
-                _isNextOrSkipKeyDown = true;
-            }
+            _isNextOrSkipKeyDown = true;
         } else {
             _isNextOrSkipKeyDown = false;
         }
-        
-        //Debug.Log(_ordinalNumber);
     }
 
     IEnumerator WaitFontSetDone(FontResourceManager fontResourceManager) {
@@ -74,22 +70,21 @@ public class DisplayTalkingInformation : MonoBehaviour {
     private IEnumerator TraverseChoice(JArray choiceJson) {
         for (int i = 0; i < choiceJson.Count; i++) {
             int ordinalId = (int)choiceJson[i]["ordinal"];
-            Debug.Log($"{ordinalId}  {choiceJson[i]["value"]}");
             if (ordinalId == 0) {
                 choicesBox0Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(CanvasFadeIn(choicesBoxCanvasGroup0, 0.1f));
+                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup0, 0.1f));
             }else if (ordinalId == 1) {
                 choicesBox1Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(CanvasFadeIn(choicesBoxCanvasGroup1, 0.1f));
+                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup1, 0.1f));
             }else if (ordinalId == 2) {
                 choicesBox2Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(CanvasFadeIn(choicesBoxCanvasGroup2, 0.1f));
+                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup2, 0.1f));
             }else if (ordinalId == 3) {
                 choicesBox3Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(CanvasFadeIn(choicesBoxCanvasGroup3, 0.1f));
+                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup3, 0.1f));
             }else if (ordinalId == 4) {
                 choicesBox4Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(CanvasFadeIn(choicesBoxCanvasGroup4, 0.1f));
+                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup4, 0.1f));
             }
             yield return null;
         }
@@ -107,23 +102,23 @@ public class DisplayTalkingInformation : MonoBehaviour {
                 #region 使所有选择框渐隐
 
                 if (choicesBoxCanvasGroup0.alpha != 0) {
-                    yield return StartCoroutine(CanvasFadeOut(choicesBoxCanvasGroup0, 0.1f));
+                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup0, 0.1f));
                 }
                 
                 if (choicesBoxCanvasGroup1.alpha != 0) {
-                    yield return StartCoroutine(CanvasFadeOut(choicesBoxCanvasGroup1, 0.1f));
+                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup1, 0.1f));
                 }
                 
                 if (choicesBoxCanvasGroup2.alpha != 0) {
-                    yield return StartCoroutine(CanvasFadeOut(choicesBoxCanvasGroup2, 0.1f));
+                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup2, 0.1f));
                 }
                 
                 if (choicesBoxCanvasGroup3.alpha != 0) {
-                    yield return StartCoroutine(CanvasFadeOut(choicesBoxCanvasGroup3, 0.1f));
+                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup3, 0.1f));
                 }
                 
                 if (choicesBoxCanvasGroup4.alpha != 0) {
-                    yield return StartCoroutine(CanvasFadeOut(choicesBoxCanvasGroup4, 0.1f));
+                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup4, 0.1f));
                 }
 
                 #endregion
@@ -160,15 +155,12 @@ public class DisplayTalkingInformation : MonoBehaviour {
 
     IEnumerator WaitOrdinalNumberNoNull() {
         _ordinalNumber = null;
-        _isChoosing = true;
         _isNextOrSkipKeyDown = false;
         Input.ResetInputAxes();
         yield return null;
         while (_ordinalNumber == null) {
             yield return null;
         }
-
-        _isChoosing = false;
     }
 
     private IEnumerator OutputTalkingValue(string value, int speed) {
@@ -200,42 +192,11 @@ public class DisplayTalkingInformation : MonoBehaviour {
         while (!(Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.DownArrow))) yield return null;
     }
 
-    private IEnumerator CanvasFadeIn(CanvasGroup canvas, float speed) {
-        canvas.blocksRaycasts = true;
-        float time = 0f;
-        float startAlpha = 0f;
-        float endAlpha = 1f;
-
-        while (time <= speed) {
-            time += Time.deltaTime;
-            float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, time / speed);
-            canvas.alpha = currentAlpha;
-            yield return null;
-        }
-
-        canvas.alpha = 1f;
-    }
-
-    private IEnumerator CanvasFadeOut(CanvasGroup canvas, float speed) {
-        float time = 0f;
-        float startAlpha = 1f;
-        float endAlpha = 0f;
-
-        while (time <= speed) {
-            time += Time.deltaTime;
-            float currentAlpha = Mathf.Lerp(startAlpha, endAlpha, time / speed);
-            canvas.alpha = currentAlpha;
-            yield return null;
-        }
-
-        canvas.alpha = 0f;
-        canvas.blocksRaycasts = false;
-    }
-
     #region 当选择框按钮按下
 
     public void ChoiceBtn0Click() {
         _ordinalNumber = 0;
+        
     }
     
     public void ChoiceBtn1Click() {
