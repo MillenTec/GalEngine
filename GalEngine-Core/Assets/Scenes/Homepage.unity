@@ -158,7 +158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.08, y: 0.1}
   m_AnchorMax: {x: 0.92, y: 0.9}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -0.000091552734, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &85326122
@@ -1774,6 +1774,7 @@ GameObject:
   - component: {fileID: 1215917075}
   - component: {fileID: 1215917074}
   - component: {fileID: 1215917073}
+  - component: {fileID: 1215917076}
   m_Layer: 5
   m_Name: ConfirmButton
   m_TagString: Untagged
@@ -1845,9 +1846,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1948009650}
-        m_TargetAssemblyTypeName: HomePageBtnControl, Assembly-CSharp
-        m_MethodName: IsCloseDevelopingWindow
+      - m_Target: {fileID: 1549358195}
+        m_TargetAssemblyTypeName: MessageBoxController, Assembly-CSharp
+        m_MethodName: ClickOkButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1895,6 +1896,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1215917071}
   m_CullTransparentMesh: 1
+--- !u!225 &1215917076
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1215917071}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1307745505
 GameObject:
   m_ObjectHideFlags: 0
@@ -2269,6 +2282,7 @@ GameObject:
   - component: {fileID: 1549358191}
   - component: {fileID: 1549358190}
   - component: {fileID: 1549358194}
+  - component: {fileID: 1549358195}
   m_Layer: 5
   m_Name: MessageBox
   m_TagString: Untagged
@@ -2368,10 +2382,26 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1549358189}
   m_Enabled: 1
-  m_Alpha: 1
+  m_Alpha: 0
   m_Interactable: 1
   m_BlocksRaycasts: 0
   m_IgnoreParentGroups: 0
+--- !u!114 &1549358195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549358189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c9a7f8b54bfe544bb438ef010c3dbb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  okButton: {fileID: 1215917076}
+  cancelButton: {fileID: 2040692181}
+  titleTMP: {fileID: 1821786730}
+  messageTMP: {fileID: 1871463044}
 --- !u!1 &1662422247
 GameObject:
   m_ObjectHideFlags: 0
@@ -3183,8 +3213,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0d1eca3390c888469d7927f24d9f27d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  developingWindow: {fileID: 1549358194}
   testText: {fileID: 1821786730}
+  messageBox: {fileID: 1549358194}
 --- !u!1 &1982065199
 GameObject:
   m_ObjectHideFlags: 0
@@ -3492,6 +3522,7 @@ GameObject:
   - component: {fileID: 2040692180}
   - component: {fileID: 2040692179}
   - component: {fileID: 2040692178}
+  - component: {fileID: 2040692181}
   m_Layer: 5
   m_Name: CancelButton
   m_TagString: Untagged
@@ -3563,9 +3594,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1948009650}
-        m_TargetAssemblyTypeName: HomePageBtnControl, Assembly-CSharp
-        m_MethodName: IsCloseDevelopingWindow
+      - m_Target: {fileID: 1549358195}
+        m_TargetAssemblyTypeName: MessageBoxController, Assembly-CSharp
+        m_MethodName: ClickCancelButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3613,6 +3644,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2040692176}
   m_CullTransparentMesh: 1
+--- !u!225 &2040692181
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2040692176}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2110529147
 GameObject:
   m_ObjectHideFlags: 0
@@ -3667,8 +3710,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0d1eca3390c888469d7927f24d9f27d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  developingWindow: {fileID: 0}
   testText: {fileID: 0}
+  messageBox: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

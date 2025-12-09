@@ -1,8 +1,10 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
+using System;
 
 public class HomePageBtnControl : MonoBehaviour {
     public TextMeshProUGUI testText;
@@ -25,6 +27,14 @@ public class HomePageBtnControl : MonoBehaviour {
         StartCoroutine(WaitFontSetDone(fontResourceManager));
     }
 
+    private void OnEnable() {
+        _messageBoxController.OnMessageBoxButtonClick += RaiseOnMessageBoxButtonClick;
+    }
+
+    private void OnDisable() {
+        _messageBoxController.OnMessageBoxButtonClick -= RaiseOnMessageBoxButtonClick;
+    }
+
     private void Update() {
 
     }
@@ -43,9 +53,11 @@ public class HomePageBtnControl : MonoBehaviour {
         _messageBoxController.MessageBox("Coming Soon", "马上就会来到", MessageBoxType.OnlyOk);
     }
 
-    IEnumerator WaitMessageBoxOkButtonClick() {
-        while (!_messageBoxController.isOkButtonClick) yield return null;
-        _messageBoxController.CloseMessageBox();
+    void RaiseOnMessageBoxButtonClick(Button button) {
+        Debug.Log(button);
+        if (button == Button.Confirm) {
+            _messageBoxController.CloseMessageBox();
+        }
     }
 
     public void ClickCloseButton() {

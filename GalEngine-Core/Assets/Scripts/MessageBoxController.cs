@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 
 public enum MessageBoxType { Normal, OnlyCancel, OnlyOk }
+public enum Button {Confirm, Cancel}
 
 public class MessageBoxController : MonoBehaviour {
     private CanvasGroup _canvasGroup;
@@ -11,9 +13,9 @@ public class MessageBoxController : MonoBehaviour {
     public CanvasGroup cancelButton;
     public TextMeshProUGUI titleTMP;
     public TextMeshProUGUI messageTMP;
-
-    public bool isCancelButtonClick = false;
-    public bool isOkButtonClick = false;
+    
+    public event Action<Button> OnMessageBoxButtonClick;
+    
     private void Awake() {
         _canvasGroup = GetComponent<CanvasGroup>();
         if (_canvasGroup == null) {
@@ -21,24 +23,20 @@ public class MessageBoxController : MonoBehaviour {
         }
 
         _canvasGroup.alpha = 0;
-        okButton.alpha = 0;
-        cancelButton.alpha = 0;
     }
     
     public void MessageBox(string title, string message, MessageBoxType type) {
-        isCancelButtonClick = false;
-        isOkButtonClick = false;
         titleTMP.text = title;
         messageTMP.text = message;
         if (type == MessageBoxType.Normal) {
-            okButton.alpha = 1;
-            cancelButton.alpha = 1;
+            okButton.gameObject.SetActive(true);
+            cancelButton.gameObject.SetActive(true);
         }else if (type == MessageBoxType.OnlyCancel) {
-            okButton.alpha = 0;
-            cancelButton.alpha = 1;
+            okButton.gameObject.SetActive(false);
+            cancelButton.gameObject.SetActive(true);
         }else if (type == MessageBoxType.OnlyOk) {
-            okButton.alpha = 1;
-            cancelButton.alpha = 0;
+            okButton.gameObject.SetActive(true);
+            cancelButton.gameObject.SetActive(false);
         }
         StartCoroutine(Animation.CanvasFadeIn(_canvasGroup, 0.1f));
     }
@@ -48,10 +46,10 @@ public class MessageBoxController : MonoBehaviour {
     }
 
     public void ClickCancelButton() {
-        isCancelButtonClick = true;
+        OnMessageBoxButtonClick?.Invoke(Button.Cancel);
     }
 
     public void ClickOkButton() {
-        isOkButtonClick = true;
+        OnMessageBoxButtonClick?.Invoke(Button.Confirm);
     }
 }
