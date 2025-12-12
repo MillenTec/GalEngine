@@ -6,6 +6,7 @@ public static class Animation {
     public static IEnumerator CanvasFadeIn(CanvasGroup canvas, float speed) {
         canvas.blocksRaycasts = true;
         canvas.interactable = true;
+        canvas.gameObject.SetActive(true);
         float time = 0f;
         float startAlpha = 0f;
         float endAlpha = 1f;
@@ -35,5 +36,6 @@ public static class Animation {
         canvas.alpha = 0f;
         canvas.blocksRaycasts = false;
         canvas.interactable = false;
+        canvas.gameObject.SetActive(false);
     }
 }

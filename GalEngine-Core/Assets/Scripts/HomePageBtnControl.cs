@@ -7,17 +7,11 @@ using UnityEngine.SceneManagement;
 using System;
 
 public class HomePageBtnControl : MonoBehaviour {
-    public TextMeshProUGUI testText;
-
-    public CanvasGroup messageBox;
-    private MessageBoxController _messageBoxController;
+    
+    public MessageBoxController messageBoxController;
     
     private void Awake() {
         Application.targetFrameRate = 120;
-        _messageBoxController = messageBox.GetComponent<MessageBoxController>();
-        if (_messageBoxController == null) {
-            _messageBoxController = messageBox.AddComponent<MessageBoxController>();
-        }
     }
 
     private void Start() {
@@ -28,11 +22,11 @@ public class HomePageBtnControl : MonoBehaviour {
     }
 
     private void OnEnable() {
-        _messageBoxController.OnMessageBoxButtonClick += RaiseOnMessageBoxButtonClick;
+        messageBoxController.OnMessageBoxButtonClick += RaiseOnMessageBoxButtonClick;
     }
 
     private void OnDisable() {
-        _messageBoxController.OnMessageBoxButtonClick -= RaiseOnMessageBoxButtonClick;
+        messageBoxController.OnMessageBoxButtonClick -= RaiseOnMessageBoxButtonClick;
     }
 
     private void Update() {
@@ -50,14 +44,19 @@ public class HomePageBtnControl : MonoBehaviour {
     }
 
     public void IsClickDevelopingWindow() {
-        _messageBoxController.MessageBox("Coming Soon", "马上就会来到", MessageBoxType.OnlyOk);
+        messageBoxController.gameObject.SetActive(true);
+        messageBoxController.MessageBox("Coming Soon", "马上就会来到", MessageBoxType.OnlyOk);
     }
 
     void RaiseOnMessageBoxButtonClick(Button button) {
         Debug.Log(button);
         if (button == Button.Confirm) {
-            _messageBoxController.CloseMessageBox();
+            messageBoxController.CloseMessageBox();
         }
+    }
+
+    public void ClickSettingsButton() {
+        //StartCoroutine(Animation.CanvasFadeIn(settingsWindow, 0.1f));
     }
 
     public void ClickCloseButton() {
