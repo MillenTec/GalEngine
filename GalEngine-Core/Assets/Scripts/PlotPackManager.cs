@@ -20,6 +20,7 @@ public class PlotPackManager : MonoBehaviour {
             if (config == null) continue;
             GameObject cloneObject = Instantiate(plotItem, gameObject.transform);
             cloneObject.SetActive(true);
+            yield return null;
             PlotItem item = cloneObject.GetComponent<PlotItem>();
             JToken title = config["title"];
             JToken author = config["author"];
@@ -31,6 +32,8 @@ public class PlotPackManager : MonoBehaviour {
             } else {
                 item.title.text = "Unknow";
             }
+
+            yield return null;
             if (author != null && description != null) {
                 item.SetDescription(description.ToString(), author.ToString());
             } else if (author == null && description == null) {
@@ -41,6 +44,7 @@ public class PlotPackManager : MonoBehaviour {
                item.SetDescription(description.ToString()); 
             }
 
+            yield return null;
             
             if (image != null) {
                 Sprite sprite = ExternalResourceLoader.LoadSpriteFromFile($"{packPath}/{image.ToString()}");
@@ -48,6 +52,8 @@ public class PlotPackManager : MonoBehaviour {
                     item.SetImage(sprite);
                 }
             }
+            
+            item.Display();
 
             yield return null;
         }

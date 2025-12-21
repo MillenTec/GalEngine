@@ -4,8 +4,8 @@
   "link": "https://github.com/MillenTec",
   "id": "example_plot_pack",
   "version": "1.0.0",
-  "galengine_version": ["1.0.0"],
   "description": "This is an example",
   "license": "MIT",
-  "cover": "millentec.png"
+  "cover": "millentec.png",
+  "index": "index.json"
 }

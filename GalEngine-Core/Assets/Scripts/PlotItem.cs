@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -11,6 +12,18 @@ public class PlotItem : MonoBehaviour {
     public TextMeshProUGUI description;
     public Image image;
     public string PointToPath;
+
+    private CanvasGroup _canvasGroup;
+
+    public void Display() {
+        _canvasGroup = GetComponent<CanvasGroup>();
+        if (_canvasGroup == null) {
+            gameObject.AddComponent<CanvasGroup>();
+            _canvasGroup = GetComponent<CanvasGroup>();
+        }
+        _canvasGroup.alpha = 0;
+        StartCoroutine(Animation.CanvasFadeIn(_canvasGroup, 0.2f));
+    }
 
     public void SetTitle(string value) {
         title.text = value;

@@ -1148,7 +1148,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 1
+  m_ScrollSensitivity: 150
   m_Viewport: {fileID: 937017039}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 515589490}
@@ -1387,6 +1387,7 @@ GameObject:
   - component: {fileID: 1368803613}
   - component: {fileID: 1368803615}
   - component: {fileID: 1368803614}
+  - component: {fileID: 1368803616}
   m_Layer: 5
   m_Name: PlotItem
   m_TagString: Untagged
@@ -1445,6 +1446,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
+--- !u!225 &1368803616
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368803612}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &1647822051
 GameObject:
   m_ObjectHideFlags: 0
