@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using TMPro;
 
 public enum MessageBoxType { Normal, OnlyCancel, OnlyOk }

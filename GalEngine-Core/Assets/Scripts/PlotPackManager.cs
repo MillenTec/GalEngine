@@ -1,15 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlotPackManager : MonoBehaviour {
-    private Grid _gridContainer;
     public GameObject plotItem;
     
     void Start() {
-        _gridContainer = GetComponent<Grid>();
         StartCoroutine(ListAllPackItem());
     }
 

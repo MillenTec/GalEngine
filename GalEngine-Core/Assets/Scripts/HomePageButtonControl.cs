@@ -1,11 +1,7 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
-using System;
-using System.IO;
 
 public class HomePageButtonControl : MonoBehaviour {
     

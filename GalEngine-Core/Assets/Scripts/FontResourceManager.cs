@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class CoroutineProxy : MonoBehaviour {
     private static CoroutineProxy _instance;
