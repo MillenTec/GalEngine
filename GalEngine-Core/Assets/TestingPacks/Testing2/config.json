@@ -1,0 +1,22 @@
+﻿{
+  "title": "Example Configuration2",
+  "author": "MillenTec",
+  "link": "https://github.com/MillenTec",
+  "id": "example_plot_pack1",
+  "version": "1.0.0",
+  "galengine_version": ["1.0.0"],
+  "description": "This is an example",
+  "license": "MIT",
+  "cover": "test.png",
+  "pack_type": {
+    "UI": true,
+    "Plots": true,
+    "Music": true,
+    "Sounds": true
+  },
+  "plots_list": [
+    "Plots/chapter1/PlotInformation.json",
+    "Plots/chapter2/PlotInformation.json",
+    "Plots/chapter3/PlotInformation.json"
+  ]
+}

@@ -20,6 +20,7 @@ public class DisplayTalkingInformation : MonoBehaviour {
     public TextMeshProUGUI choicesBox2Text;
     public TextMeshProUGUI choicesBox3Text;
     public TextMeshProUGUI choicesBox4Text;
+    public Image backgroundImage;
     
     private TextAsset _jsonData;
     private int? _ordinalNumber = null;
@@ -30,7 +31,7 @@ public class DisplayTalkingInformation : MonoBehaviour {
     private int _tempTalkingValueOutputSpeed; // 临时存储Speed值，用于跳过逐字输出中使用
 
     private void Awake() {
-        _jsonData = Resources.Load<TextAsset>("tempTest/data");
+        _jsonData = Resources.Load<TextAsset>("tempTest/data");  // TODO: 现在从Resources加载JSON文件，将来要改为从外部加载
         _plotJsonData = JArray.Parse(_jsonData.text);
     }
 
@@ -64,7 +65,7 @@ public class DisplayTalkingInformation : MonoBehaviour {
     private IEnumerator WaitNextKeyDown() {
         while (!_isNextOrSkipKeyDown) yield return null;
 
-        while (_isNextOrSkipKeyDown) yield return null;
+        while (_isNextOrSkipKeyDown) yield return null;  // 等待放开按键(防抖)
     }
 
     private IEnumerator TraverseChoice(JArray choiceJson) {
@@ -91,7 +92,7 @@ public class DisplayTalkingInformation : MonoBehaviour {
     }
 
     private IEnumerator DisplaySpeakerNameAndValue(JArray jsonData, int nodeId) {
-        int[] jsonIndex = new int[2];
+        int[] jsonIndex = new int[2];  // 两个值的数组，索引0存储的是顶层JSON数组，索引1存储的是选择分支的编号
         jsonIndex[0] = nodeId;
         if (jsonIndex[0] == (int)jsonData[jsonIndex[0]]["node"]) {
             string nodeType = (string)jsonData[jsonIndex[0]]["type"];
@@ -165,16 +166,16 @@ public class DisplayTalkingInformation : MonoBehaviour {
 
     private IEnumerator OutputTalkingValue(string value, int speed) {
         _isInTextOutput = true;
-        _tempTalkingValueOutputSpeed = speed;
-        StartCoroutine(GetSkipAndSetTempSpeed());
+        _tempTalkingValueOutputSpeed = speed;  // 重置临时速度，这个值可能会在GetSkipAndSetTempSpeed方法中被更改
+        StartCoroutine(GetSkipAndSetTempSpeed());  // TODO: 此时利用一个单独协程来监测按键状态可能不太合理，后期将改为事件
         talkingText.text = "";
         char[] valueArray = value.ToCharArray();
         foreach (char word in valueArray) {
             talkingText.text += word;
             yield return null;
-            speed = _tempTalkingValueOutputSpeed;
-            float speedF = speed / 1000f;
-            yield return new WaitForSeconds(speedF);
+            speed = _tempTalkingValueOutputSpeed;  // 每次循环检查一次临时速度的值，如果速度变为0会被更改
+            float speedSeconds = speed / 1000f;
+            yield return new WaitForSeconds(speedSeconds);
         }
 
         _tempTalkingValueOutputSpeed = talkingValueOutputSpeed;
