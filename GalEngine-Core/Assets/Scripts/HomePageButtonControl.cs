@@ -28,10 +28,6 @@ public class HomePageButtonControl : MonoBehaviour {
         messageBoxController.OnMessageBoxButtonClick -= RaiseOnMessageBoxButtonClick;
     }
 
-    private void Update() {
-
-    }
-
     IEnumerator WaitFontSetDone(FontResourceManager fontResourceManager) {
         while (!fontResourceManager.IsSetDone) {
             yield return null;
@@ -56,6 +52,10 @@ public class HomePageButtonControl : MonoBehaviour {
 
     public void ClickSettingsButton() {
         //StartCoroutine(Animation.CanvasFadeIn(settingsWindow, 0.1f));
+    }
+
+    public void ClickStartButton() {
+        SceneManager.LoadSceneAsync("PackManager");
     }
 
     public void ClickCloseButton() {

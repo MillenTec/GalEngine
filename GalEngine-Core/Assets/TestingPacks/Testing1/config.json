@@ -6,6 +6,6 @@
   "version": "1.0.0",
   "description": "This is an example",
   "license": "MIT",
-  "cover": "millentec.png",
-  "index": "index.json"
+  "cover": "millentec.png",  // 这张图片来自Blue Archive，目前我本人使用的头像，这里仅做临时测试使用
+  "index": "json.json"
 }

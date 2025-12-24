@@ -1,12 +1,18 @@
+using System;
 using System.Collections;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlotPackManager : MonoBehaviour {
     public GameObject plotItem;
     
     void Start() {
         StartCoroutine(ListAllPackItem());
+    }
+
+    private void OnEnable() {
+        GameEvents.OnSelectedPlotPack += RaiseOnSelectedPlotPack;
     }
 
     IEnumerator ListAllPackItem() {
@@ -53,6 +59,16 @@ public class PlotPackManager : MonoBehaviour {
 
             yield return null;
         }
+    }
+
+    private void OnDisable() {
+        GameEvents.OnSelectedPlotPack -= RaiseOnSelectedPlotPack;
+    }
+
+    void RaiseOnSelectedPlotPack(string path) {
+        GameEvents.GamingPackPath = path;
+        SceneManager.LoadSceneAsync("Gaming");
+        Debug.Log("Begin to Loading");
     }
     
     void Update() {

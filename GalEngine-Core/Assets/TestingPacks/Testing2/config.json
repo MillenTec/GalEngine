@@ -6,6 +6,6 @@
   "version": "1.0.0",
   "description": "This is an example",
   "license": "MIT",
-  "cover": "test.png",
-  "index": "index.json"
+  "cover": "test.png",  // 这是一张使用Stable Diffusion生成的图片，当前仅作为临时测试使用
+  "index": "json.json"
 }

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections;
+using System.ComponentModel;
+using System.IO;
 using Newtonsoft.Json.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DisplayTalkingInformation : MonoBehaviour {
@@ -20,25 +23,63 @@ public class DisplayTalkingInformation : MonoBehaviour {
     public TextMeshProUGUI choicesBox3Text;
     public TextMeshProUGUI choicesBox4Text;
     public Image backgroundImage;
-    
+    public TextMeshProUGUI descriptionText;
+    public MessageBoxController messageBoxController;
+
+    private string _packPath;
+    private JObject _config;
     private TextAsset _jsonData;
     private int? _ordinalNumber = null;
-
+    private string _jsonFullPath;
     private JArray _plotJsonData;
     private bool _isInTextOutput; // 用于显示是否处于逐字输出迭代器中，为了使跳过判定迭代器拥有退出条件
     private bool _isNextOrSkipKeyDown; // 用于检测空格或向下键是否按下
     private int _tempTalkingValueOutputSpeed; // 临时存储Speed值，用于跳过逐字输出中使用
 
-    private void Awake() {
-        _jsonData = Resources.Load<TextAsset>("tempTest/data");  // TODO: 现在从Resources加载JSON文件，将来要改为从外部加载
-        _plotJsonData = JArray.Parse(_jsonData.text);
-    }
-
     private void Start() {
-        TextMeshProUGUI[] textMashProList = GetComponentsInChildren<TextMeshProUGUI>(); 
+        _packPath = GameEvents.GamingPackPath;
+        GameEvents.GamingPackPath = null;
+        try {
+            if (!File.Exists($"{_packPath}/config.json")) {
+                throw new Exception($"ERROR: 文件{_packPath}/config.json不存在");
+            }
+
+            string configValue = File.ReadAllText($"{_packPath}/config.json");
+            _config = JObject.Parse(configValue);
+            if (_config["index"] == null) {
+                throw new Exception("ERROR: 该config文件中不存在\"index\"键值");
+            }
+
+            string jsonPath = _config["index"].ToString();
+            _jsonFullPath = $"{_packPath}/{jsonPath}";
+            if (!File.Exists(_jsonFullPath)) {
+                throw new Exception($"ERROR: 文件{_jsonFullPath}不存在");
+            }
+
+            string jsonData = File.ReadAllText(_jsonFullPath);
+            _plotJsonData = JArray.Parse(jsonData);
+        } catch (Exception ex) {
+            Debug.LogError(ex);
+            messageBoxController.MessageBox("无法打开", $"打开此剧情包时遇到错误\n{ex}\n请尝试解决后再打开", MessageBoxType.OnlyOk);
+        }
+        
+        Debug.Log("校验完毕");
+        
+        TextMeshProUGUI[] textMashProList = GetComponentsInChildren<TextMeshProUGUI>();
         FontResourceManager fontResourceManager = new FontResourceManager();
         fontResourceManager.SetTMProFont(textMashProList);
+        Debug.Log("字体已完成设置");
         StartCoroutine(WaitFontSetDone(fontResourceManager));
+        Debug.Log("协程已启动");
+    }
+
+    private void OnEnable() {
+        messageBoxController.OnMessageBoxButtonClick += RaiseOnMessageBoxButtonClick;
+    }
+
+    void RaiseOnMessageBoxButtonClick(Button button) {
+        messageBoxController.CloseMessageBox();
+        SceneManager.LoadSceneAsync("PackManager");
     }
 
     private void Update() {
@@ -53,18 +94,23 @@ public class DisplayTalkingInformation : MonoBehaviour {
         while (!fontResourceManager.IsSetDone) {
             yield return null;
         }
-        StartCoroutine(TraverseJson(_plotJsonData));
+        yield return StartCoroutine(TraverseJson(_plotJsonData));
+        SceneManager.LoadSceneAsync("PackManager");
     }
 
     private IEnumerator TraverseJson(JArray tempJsonData) {
-        for (int i = 0; i < tempJsonData.Count; i++) // 遍历JSON的第一层数组，并调用显示名字及内容迭代器直到结束
+        for (int i = 0; i < tempJsonData.Count; i++) {   // 遍历JSON的第一层数组，并调用显示名字及内容迭代器直到结束
             yield return StartCoroutine(DisplaySpeakerNameAndValue(tempJsonData, i));
+            Debug.Log($"完成第{i}层");
+        }
+        Debug.Log("已退出协程");
     }
 
     private IEnumerator WaitNextKeyDown() {
+        Debug.Log("等待按下按键");
         while (!_isNextOrSkipKeyDown) yield return null;
-
         while (_isNextOrSkipKeyDown) yield return null;  // 等待放开按键(防抖)
+        Debug.Log("下一步");
     }
 
     private IEnumerator TraverseChoice(JArray choiceJson) {
@@ -90,10 +136,36 @@ public class DisplayTalkingInformation : MonoBehaviour {
         }
     }
 
+    // TODO: 比较早期写的代码，现在看来有一些地方处理得不好，未来可能重构
     private IEnumerator DisplaySpeakerNameAndValue(JArray jsonData, int nodeId) {
+        Debug.Log($"开始播放{nodeId}");
         int[] jsonIndex = new int[2];  // 两个值的数组，索引0存储的是顶层JSON数组，索引1存储的是选择分支的编号
         jsonIndex[0] = nodeId;
+        Debug.Log($"{jsonIndex[0] == (int)jsonData[jsonIndex[0]]["node"]} {nodeId} {jsonData[jsonIndex[0]]["node"]}");
         if (jsonIndex[0] == (int)jsonData[jsonIndex[0]]["node"]) {
+            if (jsonData[jsonIndex[0]]["background"] != null) {
+                string background = jsonData[jsonIndex[0]]["background"].ToString();
+                if (background != "NULL") {
+                    string backgroundPath = $"{_packPath}/{background}";
+                    try {
+                        if (!File.Exists(backgroundPath)) {
+                            throw new WarningException($"WARNING: 文件{backgroundPath}不存在");
+                        }
+
+                        Sprite sprite = ExternalResourceLoader.LoadSpriteFromFile(backgroundPath);
+                        backgroundImage.sprite = sprite;
+                        backgroundImage.color = new Color(256, 256, 256, 1);
+                    } catch (WarningException wex) {
+                        Debug.LogWarning(wex);
+                    } catch (Exception ex) {
+                        Debug.LogError(ex);
+                    }
+
+                    yield return null;
+                } else if (background == "NULL") {
+                    backgroundImage.color = new Color(256, 256, 256, 0);
+                }
+            }
             string nodeType = (string)jsonData[jsonIndex[0]]["type"];
             if (nodeType == "branch") {
                 JArray choiceJson = (JArray)jsonData[jsonIndex[0]]["choice"];
@@ -141,16 +213,26 @@ public class DisplayTalkingInformation : MonoBehaviour {
                 }
                 yield return StartCoroutine(TraverseJson(jsonBranch));
             } else if (nodeType == "node") {
+                Debug.Log("This a node");
                 string nameValue = (string)jsonData[jsonIndex[0]]["character"];
                 string talkValue = (string)jsonData[jsonIndex[0]]["value"];
+                if (jsonData[jsonIndex[0]]["description"] != null) {
+                    string description = (string)jsonData[jsonIndex[0]]["description"];
+                    descriptionText.text = description;
+                } else {
+                    descriptionText.text = "";
+                }
                 Debug.Log($"Name:{nameValue}  Value:{talkValue}");
                 nameText.text = nameValue;
+                Debug.Log($"正在等待按下下一个按键");
                 yield return StartCoroutine(OutputTalkingValue(talkValue, talkingValueOutputSpeed));
                 yield return StartCoroutine(WaitNextKeyDown());
             }
         } else {
             Debug.Log("ERROR: JSON格式错误，请确保ID编号正确");
         }
+        
+        Debug.Log($"{nodeId}已完成");
     }
 
     IEnumerator WaitOrdinalNumberNoNull() {
@@ -164,9 +246,10 @@ public class DisplayTalkingInformation : MonoBehaviour {
     }
 
     private IEnumerator OutputTalkingValue(string value, int speed) {
+        Debug.Log("等待输出完毕...");
         _isInTextOutput = true;
         _tempTalkingValueOutputSpeed = speed;  // 重置临时速度，这个值可能会在GetSkipAndSetTempSpeed方法中被更改
-        StartCoroutine(GetSkipAndSetTempSpeed());  // TODO: 此时利用一个单独协程来监测按键状态可能不太合理，后期将改为事件
+        StartCoroutine(GetSkipAndSetTempSpeed());
         talkingText.text = "";
         char[] valueArray = value.ToCharArray();
         foreach (char word in valueArray) {
@@ -176,7 +259,6 @@ public class DisplayTalkingInformation : MonoBehaviour {
             float speedSeconds = speed / 1000f;
             yield return new WaitForSeconds(speedSeconds);
         }
-
         _tempTalkingValueOutputSpeed = talkingValueOutputSpeed;
         _isInTextOutput = false;
     }
