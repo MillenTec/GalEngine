@@ -2,6 +2,7 @@
     <h1>GalEngine</h1>
     <strong>剧情引擎</strong>
     <p>🚧目前它仍然在开发阶段🚧</p>
+    <p>简体中文 | <a href="README.en-us.md">English</a></p>
     <hr>
 </div>
 
@@ -156,3 +157,4 @@ GalGame也被称为"视觉小说"，其剧情内容以恋爱为主，本质就�
 - GitHub: [MillenTec](https://github.com/MillenTec)
 - bilibili: [MillenTec](https://space.bilibili.com/3546591566760474)
 - Email: MillenTec@outlook.com
+- 社区: [Microsoft Teams](https://teams.live.com/l/community/FBAPJVv6nA7sOvEzgI)
