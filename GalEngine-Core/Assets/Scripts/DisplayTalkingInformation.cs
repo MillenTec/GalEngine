@@ -39,9 +39,14 @@ public class DisplayTalkingInformation : MonoBehaviour {
     private bool _isNextOrSkipKeyDown; // 用于检测空格或向下键是否按下
     private int _tempTalkingValueOutputSpeed; // 临时存储Speed值，用于跳过逐字输出中使用
 
-    private void Start() {
+    private IEnumerator Start() {
         _packPath = GameEvents.GamingPackPath;
         GameEvents.GamingPackPath = null;
+        TextMeshProUGUI[] textMashProList = GetComponentsInChildren<TextMeshProUGUI>();
+        FontResourceManager fontResourceManager = new FontResourceManager();
+        fontResourceManager.SetTMProFont(textMashProList);
+        Debug.Log("字体已完成设置");
+        yield return StartCoroutine(WaitFontSetDone(fontResourceManager));
         try {
             if (!File.Exists($"{_packPath}/config.json")) {
                 throw new Exception($"ERROR: 文件{_packPath}/config.json不存在");
@@ -61,19 +66,19 @@ public class DisplayTalkingInformation : MonoBehaviour {
 
             string jsonData = File.ReadAllText(_jsonFullPath);
             _plotJsonData = JArray.Parse(jsonData);
+            
+            Debug.Log("校验完毕");
+            
+            StartCoroutine(BeginDialogue());
         } catch (Exception ex) {
             Debug.LogError(ex);
             messageBoxController.MessageBox("无法打开", $"打开此剧情包时遇到错误\n{ex}\n请尝试解决后再打开", MessageBoxType.OnlyOk);
         }
-        
-        Debug.Log("校验完毕");
-        
-        TextMeshProUGUI[] textMashProList = GetComponentsInChildren<TextMeshProUGUI>();
-        FontResourceManager fontResourceManager = new FontResourceManager();
-        fontResourceManager.SetTMProFont(textMashProList);
-        Debug.Log("字体已完成设置");
-        StartCoroutine(WaitFontSetDone(fontResourceManager));
-        Debug.Log("协程已启动");
+    }
+
+    IEnumerator BeginDialogue() {
+        yield return StartCoroutine(TraverseJson(_plotJsonData));
+        SceneManager.LoadSceneAsync("PackManager");
     }
 
     private void OnEnable() {
@@ -97,8 +102,6 @@ public class DisplayTalkingInformation : MonoBehaviour {
         while (!fontResourceManager.IsSetDone) {
             yield return null;
         }
-        yield return StartCoroutine(TraverseJson(_plotJsonData));
-        SceneManager.LoadSceneAsync("PackManager");
     }
 
     private IEnumerator TraverseJson(JArray tempJsonData) {
@@ -121,19 +124,19 @@ public class DisplayTalkingInformation : MonoBehaviour {
             int ordinalId = (int)choiceJson[i]["ordinal"];
             if (ordinalId == 0) {
                 choicesBox0Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup0, 0.1f));
+                StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup0, 0.1f));
             }else if (ordinalId == 1) {
                 choicesBox1Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup1, 0.1f));
+                StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup1, 0.1f));
             }else if (ordinalId == 2) {
                 choicesBox2Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup2, 0.1f));
+                StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup2, 0.1f));
             }else if (ordinalId == 3) {
                 choicesBox3Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup3, 0.1f));
+                StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup3, 0.1f));
             }else if (ordinalId == 4) {
                 choicesBox4Text.text = (string)choiceJson[i]["value"];
-                yield return StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup4, 0.1f));
+                StartCoroutine(Animation.CanvasFadeIn(choicesBoxCanvasGroup4, 0.1f));
             }
             yield return null;
         }
@@ -157,7 +160,7 @@ public class DisplayTalkingInformation : MonoBehaviour {
 
                         Sprite sprite = ExternalResourceLoader.LoadSpriteFromFile(backgroundPath);
                         backgroundImage.sprite = sprite;
-                        backgroundImage.color = new Color(256, 256, 256, 1);
+                        StartCoroutine(Animation.ChangeColor(backgroundImage, backgroundImage.color, Color.white, 0.2f));
                     } catch (WarningException wex) {
                         Debug.LogWarning(wex);
                     } catch (Exception ex) {
@@ -166,7 +169,8 @@ public class DisplayTalkingInformation : MonoBehaviour {
 
                     yield return null;
                 } else if (background == "NULL") {
-                    backgroundImage.color = new Color(256, 256, 256, 0);
+                    backgroundImage.sprite = null;
+                    StartCoroutine(Animation.ChangeColor(backgroundImage, backgroundImage.color, Color.black, 0.2f));
                 }
             }
             string nodeType = (string)jsonData[jsonIndex[0]]["type"];
@@ -177,23 +181,23 @@ public class DisplayTalkingInformation : MonoBehaviour {
                 #region 使所有选择框渐隐
 
                 if (choicesBoxCanvasGroup0.alpha != 0) {
-                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup0, 0.1f));
+                    StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup0, 0.1f));
                 }
                 
                 if (choicesBoxCanvasGroup1.alpha != 0) {
-                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup1, 0.1f));
+                    StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup1, 0.1f));
                 }
                 
                 if (choicesBoxCanvasGroup2.alpha != 0) {
-                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup2, 0.1f));
+                    StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup2, 0.1f));
                 }
                 
                 if (choicesBoxCanvasGroup3.alpha != 0) {
-                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup3, 0.1f));
+                    StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup3, 0.1f));
                 }
                 
                 if (choicesBoxCanvasGroup4.alpha != 0) {
-                    yield return StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup4, 0.1f));
+                    StartCoroutine(Animation.CanvasFadeOut(choicesBoxCanvasGroup4, 0.1f));
                 }
 
                 #endregion
@@ -227,6 +231,7 @@ public class DisplayTalkingInformation : MonoBehaviour {
                 }
                 Debug.Log($"Name:{nameValue}  Value:{talkValue}");
                 nameText.text = nameValue;
+                //OnDialogueChange?.Invoke();
                 Debug.Log($"正在等待按下下一个按键");
                 yield return StartCoroutine(OutputTalkingValue(talkValue, talkingValueOutputSpeed));
                 yield return StartCoroutine(WaitNextKeyDown());

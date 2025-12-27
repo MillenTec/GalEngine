@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class NameTitleController : MonoBehaviour {
@@ -17,11 +18,12 @@ public class NameTitleController : MonoBehaviour {
             _descriptionRectTransform = descriptionText.AddComponent<RectTransform>();
         }
     }
-    
+
     void Update() {
-        Vector3 nameTitlePosition = _nameRectTransform.position;
+        Debug.Log(Screen.width);
+        Vector3 nameTitlePosition = _nameRectTransform.localPosition;
         float nameTitleWidth = _nameRectTransform.rect.width;
-        nameTitlePosition.x += 25 + nameTitleWidth/2;
-        _descriptionRectTransform.position = nameTitlePosition;
+        nameTitlePosition.x += nameTitleWidth;
+        _descriptionRectTransform.localPosition = nameTitlePosition;
     }
 }

@@ -129,6 +129,22 @@ public class ExternalResourceLoader {
         }
     }
 
+    public static void GetPageBackground() {
+        if (Directory.Exists($"{PathManager.GetApplicationRootPath()}/UI/pageBackground")) {
+            string uiPath = $"{PathManager.GetApplicationRootPath()}/UI/pageBackground";
+            if (File.Exists($"{uiPath}/config.json")) {
+                string data = File.ReadAllText($"{uiPath}/config.json");
+                JObject config = JObject.Parse(data);
+                if (config["image"] != null) {
+                    PageBackground = LoadSpriteFromFile($"{uiPath}/{config["image"]}");
+                    float width = PageBackground.rect.width;
+                    float height = PageBackground.rect.height;
+                    BackgroundAspectRatio = width / height;
+                }
+            }
+        }
+    }
+
     public void RefreshPackList() {
         OnRefreshPackList?.Invoke();
     }

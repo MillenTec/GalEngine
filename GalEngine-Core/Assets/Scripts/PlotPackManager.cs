@@ -13,6 +13,11 @@ public class PlotPackManager : MonoBehaviour {
     public GameObject plotItem;
     
     void Start() {
+        if (ExternalResourceLoader.PageBackground == null) {
+            ExternalResourceLoader.GetPageBackground();
+        }
+        pageBackgroundImage.sprite = ExternalResourceLoader.PageBackground;
+        pageBackgroundImage.GetComponent<AspectRatioFitter>().aspectRatio =  ExternalResourceLoader.BackgroundAspectRatio;
         pageBackgroundImage.sprite = ExternalResourceLoader.PageBackground;
         pageBackgroundImage.GetComponent<AspectRatioFitter>().aspectRatio =
             ExternalResourceLoader.BackgroundAspectRatio;

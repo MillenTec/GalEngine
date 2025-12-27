@@ -15,37 +15,20 @@ public class HomePageButtonControl : MonoBehaviour {
     
     private void Awake() {
         Application.targetFrameRate = 120;
+        Debug.Log(Application.companyName);
+        Debug.Log(Application.productName);
     }
 
     private void Start() {
-        if (Directory.Exists($"{PathManager.GetApplicationRootPath()}/UI/pageBackground")) {
-            string uiPath = $"{PathManager.GetApplicationRootPath()}/UI/pageBackground";
-            if (File.Exists($"{uiPath}/config.json")) {
-                string data = File.ReadAllText($"{uiPath}/config.json");
-                JObject config = JObject.Parse(data);
-                if (config["image"] != null) {
-                    ExternalResourceLoader.PageBackground =
-                        ExternalResourceLoader.LoadSpriteFromFile($"{uiPath}/{config["image"]}");
-                    pageBackgroundImage.sprite = ExternalResourceLoader.PageBackground;
-                    /*
-                    if (config["aspectRatio"] != null) {
-                        ExternalResourceLoader.BackgroundAspectRatio = config["aspectRatio"].ToObject<float>();
-                        pageBackgroundImage.GetComponent<AspectRatioFitter>().aspectRatio =  ExternalResourceLoader.BackgroundAspectRatio;
-                    }
-                    */
-                    float width = ExternalResourceLoader.PageBackground.rect.width;
-                    float height = ExternalResourceLoader.PageBackground.rect.height;
-                    ExternalResourceLoader.BackgroundAspectRatio = width / height;
-                    pageBackgroundImage.GetComponent<AspectRatioFitter>().aspectRatio =  ExternalResourceLoader.BackgroundAspectRatio;
-                }
-            }
+        if (ExternalResourceLoader.PageBackground == null) {
+            ExternalResourceLoader.GetPageBackground();
         }
+        pageBackgroundImage.sprite = ExternalResourceLoader.PageBackground;
+        pageBackgroundImage.GetComponent<AspectRatioFitter>().aspectRatio =  ExternalResourceLoader.BackgroundAspectRatio;
         TextMeshProUGUI[] textMashProList = GetComponentsInChildren<TextMeshProUGUI>(); 
         FontResourceManager fontResourceManager = new FontResourceManager();
         fontResourceManager.SetTMProFont(textMashProList);
         StartCoroutine(WaitFontSetDone(fontResourceManager));
-        Debug.Log(PathManager.GetPacksRootPath());
-        Debug.Log(ExternalResourceLoader.ListAllPackDir()[1]);
     }
 
     private void OnEnable() {
