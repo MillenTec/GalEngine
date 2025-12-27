@@ -10,7 +10,7 @@ public class PathManager {
     public static string GetApplicationRootPath() {
         string rootPath;
         #if UNITY_EDITOR
-            rootPath =  Application.dataPath;
+            rootPath =  Application.dataPath + "/TestingRootPath";
         #else
             rootPath = Application.persistentDataPath;
         #endif
@@ -20,7 +20,7 @@ public class PathManager {
     public static string GetPacksRootPath() {
         string rootPath;
         #if UNITY_EDITOR
-            rootPath =  Application.dataPath + "/TestingPacks";
+            rootPath =  Application.dataPath + "/TestingRootPath/TestingPacks";
         #else
             rootPath = $"{Application.persistentDataPath}/Packs";
         #endif
@@ -33,6 +33,8 @@ public class PathManager {
 }
 
 public class ExternalResourceLoader {
+    public static Sprite PageBackground;
+    public static float BackgroundAspectRatio;
     public event Action OnRefreshPackList;
     
     public static string[] ListAllPackDir() {

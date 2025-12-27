@@ -1,13 +1,21 @@
+/*
+ * PackManager页面的主逻辑
+ */
 using System;
 using System.Collections;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlotPackManager : MonoBehaviour {
+    public Image pageBackgroundImage;
     public GameObject plotItem;
     
     void Start() {
+        pageBackgroundImage.sprite = ExternalResourceLoader.PageBackground;
+        pageBackgroundImage.GetComponent<AspectRatioFitter>().aspectRatio =
+            ExternalResourceLoader.BackgroundAspectRatio;
         StartCoroutine(ListAllPackItem());
     }
 
@@ -63,6 +71,10 @@ public class PlotPackManager : MonoBehaviour {
 
     private void OnDisable() {
         GameEvents.OnSelectedPlotPack -= RaiseOnSelectedPlotPack;
+    }
+
+    public void OnExitButtonClick() {
+        SceneManager.LoadSceneAsync("Homepage");
     }
 
     void RaiseOnSelectedPlotPack(string path) {

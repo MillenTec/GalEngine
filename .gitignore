@@ -101,4 +101,5 @@ InitTestScene*.unity*
 /GalEngine-Core/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
 /GalEngine-Core/Assets/Resources/Fonts/full*
-/GalEngine-Core/Assets/TestingPacks/*
+/GalEngine-Core/Assets/TestingRootPath/*
+/GalEngine-Core/Assets/TestingRootPath.meta

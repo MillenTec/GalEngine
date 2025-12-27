@@ -6731,6 +6731,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0d1eca3390c888469d7927f24d9f27d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pageBackgroundImage: {fileID: 1178579950}
   messageBoxController: {fileID: 1549358195}
 --- !u!1 &1982065199
 GameObject:

@@ -1,4 +1,7 @@
-﻿using System;
+﻿/*
+ * Gaming页的主逻辑
+ */
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.IO;
