@@ -11,7 +11,11 @@ using UnityEngine.UI;
 public class PlotPackManager : MonoBehaviour {
     public Image pageBackgroundImage;
     public GameObject plotItem;
-    
+
+    private void Awake() {
+        Application.targetFrameRate = 120;
+    }
+
     void Start() {
         if (ExternalResourceLoader.PageBackground == null) {
             ExternalResourceLoader.GetPageBackground();

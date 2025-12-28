@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -39,6 +40,10 @@ public class DisplayDialogue : MonoBehaviour {
     private bool _isNextOrSkipKeyDown; // 用于检测空格或向下键是否按下
     private int _tempTalkingValueOutputSpeed; // 临时存储Speed值，用于跳过逐字输出中使用
     private bool _isObjectClicked = false;
+
+    private void Awake() {
+        Application.targetFrameRate = 120;
+    }
 
     private IEnumerator Start() {
         GameEvents.OnObjectClicked += RaiseObjectClick;
@@ -150,29 +155,45 @@ public class DisplayDialogue : MonoBehaviour {
         jsonIndex[0] = nodeId;
         if (jsonIndex[0] == (int)jsonData[jsonIndex[0]]["node"]) {
             if (jsonData[jsonIndex[0]]["background"] != null) {
-                string background = jsonData[jsonIndex[0]]["background"].ToString();
-                if (background != "NULL") {
-                    string backgroundPath = $"{_packPath}/{background}";
-                    try {
-                        if (!File.Exists(backgroundPath)) {
-                            throw new WarningException($"WARNING: 文件{backgroundPath}不存在");
+                CanvasGroup canvasGroup = backgroundImage.GetComponent<CanvasGroup>();
+                string backgroundPath = $"{_packPath}/{jsonData[jsonIndex[0]]["background"]}";
+                if (jsonData[jsonIndex[0]]["background"].ToString() != "NULL") {
+                    if (File.Exists(backgroundPath)) {
+                        Sprite background;
+                        try {
+                            background = ExternalResourceLoader.LoadSpriteFromFile(backgroundPath);
+                        } catch (Exception ex) {
+                            Debug.LogError(ex);
+                            background = null;
                         }
 
-                        Sprite sprite = ExternalResourceLoader.LoadSpriteFromFile(backgroundPath);
-                        backgroundImage.sprite = sprite;
-                        StartCoroutine(Animation.ChangeColor(backgroundImage, backgroundImage.color, Color.white, 0.2f));
-                    } catch (WarningException wex) {
-                        Debug.LogWarning(wex);
-                    } catch (Exception ex) {
-                        Debug.LogError(ex);
+                        yield return null;
+                        if (background != null) {
+                            backgroundImage.sprite = background;
+                            backgroundImage.gameObject.GetComponent<AspectRatioFitter>().aspectRatio =
+                                background.rect.width / background.rect.height;
+                            if (canvasGroup.alpha != 1) {
+                                canvasGroup.alpha = 0;
+                                yield return new WaitForEndOfFrame();
+                                StartCoroutine(Animation.CanvasFadeIn(canvasGroup, 0.1f));
+                            }
+                        } else {
+                            if (canvasGroup.alpha != 0) {
+                                StartCoroutine(Animation.CanvasFadeOut(canvasGroup, 0.1f));
+                            }
+                        }
+                    } else {
+                        Debug.LogError($"ERROR: 背景图片{backgroundPath}不存在");
                     }
-
-                    yield return null;
-                } else if (background == "NULL") {
-                    backgroundImage.sprite = null;
-                    StartCoroutine(Animation.ChangeColor(backgroundImage, backgroundImage.color, Color.black, 0.2f));
+                } else {
+                    if (canvasGroup.alpha != 0) {
+                        StartCoroutine(Animation.CanvasFadeOut(canvasGroup, 0.1f));
+                    }
                 }
             }
+
+            yield return null;
+
             string nodeType = (string)jsonData[jsonIndex[0]]["type"];
             if (nodeType == "branch") {
                 JArray choiceJson = (JArray)jsonData[jsonIndex[0]]["choice"];
@@ -202,6 +223,7 @@ public class DisplayDialogue : MonoBehaviour {
 
                 #endregion
 
+                yield return null;
                 try {
                     jsonIndex[1] = (int)_ordinalNumber;
                 } catch(NullReferenceException) {
