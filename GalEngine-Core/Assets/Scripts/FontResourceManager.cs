@@ -78,7 +78,7 @@ public class FontResourceManager {
         }else if (asciiAsset != null) {
             textMeshPro.font = asciiAsset;
         } else {
-            Debug.Log("ERROR: 没有找到任何字体");
+            Debug.LogError("ERROR: 没有找到任何字体");
         }
 
         return true;

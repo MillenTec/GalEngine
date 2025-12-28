@@ -85,7 +85,6 @@ public class PlotPackManager : MonoBehaviour {
     void RaiseOnSelectedPlotPack(string path) {
         GameEvents.GamingPackPath = path;
         SceneManager.LoadSceneAsync("Gaming");
-        Debug.Log("Begin to Loading");
     }
     
     void Update() {

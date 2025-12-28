@@ -120,28 +120,41 @@ public class ExternalResourceLoader {
                 jsonData = JArray.Parse(fileText);
                 return jsonData;
             } catch (Exception ex) {
-                Debug.Log(ex);
+                Debug.LogError(ex);
                 return null;
             }
         } else {
-            Debug.Log($"ERROR: 提供的文件{filePath}不是JSON文件");
+            Debug.LogError($"ERROR: 提供的文件{filePath}不是JSON文件");
             return null;
         }
     }
 
     public static void GetPageBackground() {
         if (Directory.Exists($"{PathManager.GetApplicationRootPath()}/UI/pageBackground")) {
-            string uiPath = $"{PathManager.GetApplicationRootPath()}/UI/pageBackground";
-            if (File.Exists($"{uiPath}/config.json")) {
-                string data = File.ReadAllText($"{uiPath}/config.json");
-                JObject config = JObject.Parse(data);
-                if (config["image"] != null) {
-                    PageBackground = LoadSpriteFromFile($"{uiPath}/{config["image"]}");
-                    float width = PageBackground.rect.width;
-                    float height = PageBackground.rect.height;
-                    BackgroundAspectRatio = width / height;
+            try {
+                string uiPath = $"{PathManager.GetApplicationRootPath()}/UI/pageBackground";
+                if (File.Exists($"{uiPath}/config.json")) {
+                    string data = File.ReadAllText($"{uiPath}/config.json");
+                    JObject config = JObject.Parse(data);
+                    if (config["image"] != null) {
+                        PageBackground = LoadSpriteFromFile($"{uiPath}/{config["image"]}");
+                        float width = PageBackground.rect.width;
+                        float height = PageBackground.rect.height;
+                        BackgroundAspectRatio = width / height;
+                    }
                 }
+            }catch (Exception ex) {
+                Debug.Log(ex.Message);
+                PageBackground = Resources.Load<Sprite>("Image/background/background");
+                float width = PageBackground.rect.width;
+                float height = PageBackground.rect.height;
+                BackgroundAspectRatio = width / height;
             }
+        } else {
+            PageBackground = Resources.Load<Sprite>("Image/background/background");
+            float width = PageBackground.rect.width;
+            float height = PageBackground.rect.height;
+            BackgroundAspectRatio = width / height;
         }
     }
 

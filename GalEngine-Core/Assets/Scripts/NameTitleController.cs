@@ -20,7 +20,6 @@ public class NameTitleController : MonoBehaviour {
     }
 
     void Update() {
-        Debug.Log(Screen.width);
         Vector3 nameTitlePosition = _nameRectTransform.localPosition;
         float nameTitleWidth = _nameRectTransform.rect.width;
         nameTitlePosition.x += nameTitleWidth;
