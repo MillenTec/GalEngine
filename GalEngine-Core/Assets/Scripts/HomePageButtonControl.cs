@@ -15,8 +15,6 @@ public class HomePageButtonControl : MonoBehaviour {
     
     private void Awake() {
         Application.targetFrameRate = 120;
-        Debug.Log(Application.companyName);
-        Debug.Log(Application.productName);
     }
 
     private void Start() {
@@ -55,7 +53,6 @@ public class HomePageButtonControl : MonoBehaviour {
     }
 
     void RaiseOnMessageBoxButtonClick(Button button) {
-        Debug.Log(button);
         if (button == Button.Confirm) {
             messageBoxController.CloseMessageBox();
         }

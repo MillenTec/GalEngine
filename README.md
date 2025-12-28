@@ -115,6 +115,7 @@ GalGame也被称为"视觉小说"，其剧情内容以恋爱为主，本质就�
 ### 2.2.其他自定义
 目前仅开放了对于页面背景的自定义，后续可能会开放如UI等的自定义
 **页面背景**:
+当前的页面背景是使用[`Stable Diffusion`](https://stability.ai/)生成的，你可以选择自己喜欢的图画替换掉它；
 你应该在`Application.persistentDataPath`下操作这些内容，这个目录的位置视情况而定，如在Windows下直接编译好的这个游戏的这个目录就应该在`C:\Users\Your_name\AppData\LocalLow\MillenTec\GalEngine`；
 你可以新建一个`UI`文件夹，并在其下建立`pageBackground`子目录，其中应该包含config.json以及你的背景图片
 ```json

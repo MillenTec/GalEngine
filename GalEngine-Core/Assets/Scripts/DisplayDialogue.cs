@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class DisplayTalkingInformation : MonoBehaviour {
+public class DisplayDialogue : MonoBehaviour {
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI talkingText;
     public int talkingValueOutputSpeed = 50; // 为了方便，此处的单位为ms
@@ -38,14 +38,15 @@ public class DisplayTalkingInformation : MonoBehaviour {
     private bool _isInTextOutput; // 用于显示是否处于逐字输出迭代器中，为了使跳过判定迭代器拥有退出条件
     private bool _isNextOrSkipKeyDown; // 用于检测空格或向下键是否按下
     private int _tempTalkingValueOutputSpeed; // 临时存储Speed值，用于跳过逐字输出中使用
+    private bool _isObjectClicked = false;
 
     private IEnumerator Start() {
+        GameEvents.OnObjectClicked += RaiseObjectClick;
         _packPath = GameEvents.GamingPackPath;
         GameEvents.GamingPackPath = null;
         TextMeshProUGUI[] textMashProList = GetComponentsInChildren<TextMeshProUGUI>();
         FontResourceManager fontResourceManager = new FontResourceManager();
         fontResourceManager.SetTMProFont(textMashProList);
-        Debug.Log("字体已完成设置");
         yield return StartCoroutine(WaitFontSetDone(fontResourceManager));
         try {
             if (!File.Exists($"{_packPath}/config.json")) {
@@ -67,12 +68,16 @@ public class DisplayTalkingInformation : MonoBehaviour {
             string jsonData = File.ReadAllText(_jsonFullPath);
             _plotJsonData = JArray.Parse(jsonData);
             
-            Debug.Log("校验完毕");
-            
             StartCoroutine(BeginDialogue());
         } catch (Exception ex) {
             Debug.LogError(ex);
             messageBoxController.MessageBox("无法打开", $"打开此剧情包时遇到错误\n{ex}\n请尝试解决后再打开", MessageBoxType.OnlyOk);
+        }
+    }
+
+    private void RaiseObjectClick(string id) {
+        if (id == "gaming.click") {
+            _isObjectClicked = true;
         }
     }
 
@@ -91,7 +96,8 @@ public class DisplayTalkingInformation : MonoBehaviour {
     }
 
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.DownArrow)) {
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.DownArrow) || _isObjectClicked) {
+            _isObjectClicked =  false;
             _isNextOrSkipKeyDown = true;
         } else {
             _isNextOrSkipKeyDown = false;
@@ -106,17 +112,13 @@ public class DisplayTalkingInformation : MonoBehaviour {
 
     private IEnumerator TraverseJson(JArray tempJsonData) {
         for (int i = 0; i < tempJsonData.Count; i++) {   // 遍历JSON的第一层数组，并调用显示名字及内容迭代器直到结束
-            yield return StartCoroutine(DisplaySpeakerNameAndValue(tempJsonData, i));
-            Debug.Log($"完成第{i}层");
+            yield return StartCoroutine(DisplayDialogueInformation(tempJsonData, i));
         }
-        Debug.Log("已退出协程");
     }
 
     private IEnumerator WaitNextKeyDown() {
-        Debug.Log("等待按下按键");
         while (!_isNextOrSkipKeyDown) yield return null;
         while (_isNextOrSkipKeyDown) yield return null;  // 等待放开按键(防抖)
-        Debug.Log("下一步");
     }
 
     private IEnumerator TraverseChoice(JArray choiceJson) {
@@ -143,11 +145,9 @@ public class DisplayTalkingInformation : MonoBehaviour {
     }
 
     // TODO: 比较早期写的代码，现在看来有一些地方处理得不好，未来可能重构
-    private IEnumerator DisplaySpeakerNameAndValue(JArray jsonData, int nodeId) {
-        Debug.Log($"开始播放{nodeId}");
+    private IEnumerator DisplayDialogueInformation(JArray jsonData, int nodeId) {
         int[] jsonIndex = new int[2];  // 两个值的数组，索引0存储的是顶层JSON数组，索引1存储的是选择分支的编号
         jsonIndex[0] = nodeId;
-        Debug.Log($"{jsonIndex[0] == (int)jsonData[jsonIndex[0]]["node"]} {nodeId} {jsonData[jsonIndex[0]]["node"]}");
         if (jsonIndex[0] == (int)jsonData[jsonIndex[0]]["node"]) {
             if (jsonData[jsonIndex[0]]["background"] != null) {
                 string background = jsonData[jsonIndex[0]]["background"].ToString();
@@ -205,22 +205,18 @@ public class DisplayTalkingInformation : MonoBehaviour {
                 try {
                     jsonIndex[1] = (int)_ordinalNumber;
                 } catch(NullReferenceException) {
-                    Debug.Log("ERROR: 选择项为Null!");
                     yield break;
                 }
-                Debug.Log(_ordinalNumber);
                 _ordinalNumber = null;
-                Debug.Log(_ordinalNumber);
                 JArray jsonBranch;
                 try {
                     jsonBranch = (JArray)choiceJson[jsonIndex[1]]["branch"];
                 } catch {
-                    Debug.Log("ERROR: JSON文件不合法，branch下不是Array");
+                    Debug.LogError("ERROR: JSON文件不合法，branch下不是Array");
                     yield break;
                 }
                 yield return StartCoroutine(TraverseJson(jsonBranch));
             } else if (nodeType == "node") {
-                Debug.Log("This a node");
                 string nameValue = (string)jsonData[jsonIndex[0]]["character"];
                 string talkValue = (string)jsonData[jsonIndex[0]]["value"];
                 if (jsonData[jsonIndex[0]]["description"] != null) {
@@ -229,18 +225,14 @@ public class DisplayTalkingInformation : MonoBehaviour {
                 } else {
                     descriptionText.text = "";
                 }
-                Debug.Log($"Name:{nameValue}  Value:{talkValue}");
                 nameText.text = nameValue;
-                //OnDialogueChange?.Invoke();
-                Debug.Log($"正在等待按下下一个按键");
                 yield return StartCoroutine(OutputTalkingValue(talkValue, talkingValueOutputSpeed));
                 yield return StartCoroutine(WaitNextKeyDown());
             }
         } else {
-            Debug.Log("ERROR: JSON格式错误，请确保ID编号正确");
+            Debug.LogError("ERROR: JSON格式错误，请确保ID编号正确");
         }
         
-        Debug.Log($"{nodeId}已完成");
     }
 
     IEnumerator WaitOrdinalNumberNoNull() {
@@ -254,7 +246,6 @@ public class DisplayTalkingInformation : MonoBehaviour {
     }
 
     private IEnumerator OutputTalkingValue(string value, int speed) {
-        Debug.Log("等待输出完毕...");
         _isInTextOutput = true;
         _tempTalkingValueOutputSpeed = speed;  // 重置临时速度，这个值可能会在GetSkipAndSetTempSpeed方法中被更改
         StartCoroutine(GetSkipAndSetTempSpeed());
@@ -279,7 +270,8 @@ public class DisplayTalkingInformation : MonoBehaviour {
     }
 
     private IEnumerator WaitSkipKeyUp() {
-        while (!(Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.DownArrow))) yield return null;
+        while (!(Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.DownArrow) || _isObjectClicked)) yield return null;
+        _isObjectClicked = false;
     }
 
     #region 当选择框按钮按下

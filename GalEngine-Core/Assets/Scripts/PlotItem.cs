@@ -32,7 +32,6 @@ public class PlotItem : MonoBehaviour {
 
     public void OnButtonClick() {
         GameEvents.SendEventOnSelectedPlotPack(PointToPath);
-        Debug.Log("Plot selected");
     }
 
     public void SetImage(Sprite sprite) {

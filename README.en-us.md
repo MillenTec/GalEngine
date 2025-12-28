@@ -142,6 +142,7 @@ This is the heart of your package—it contains the entire plot. Currently, two 
 Currently, only **page background customization** is supported. More UI customization options may be added later.
 
 #### Custom Page Background
+The current page background is generated using [`Stable Diffusion`](https://stability.ai/), and you can choose your favorite image to replace it.
 You can customize the background of the package selection screen by placing files in `{Application.persistentDataPath}`.
 
 On Windows, this is typically:  
