@@ -66,7 +66,7 @@ public class PlotPackManager : MonoBehaviour {
             yield return null;
             
             if (image != null) {
-                Sprite sprite = ExternalResourceLoader.LoadSpriteFromFile($"{packPath}/{image.ToString()}");
+                Sprite sprite = ExternalResourceLoader.LoadSpriteFormFile($"{packPath}/{image.ToString()}");
                 if (sprite != null) {
                     item.SetImage(sprite);
                 }
@@ -89,9 +89,5 @@ public class PlotPackManager : MonoBehaviour {
     void RaiseOnSelectedPlotPack(string path) {
         GameEvents.GamingPackPath = path;
         SceneManager.LoadSceneAsync("Gaming");
-    }
-    
-    void Update() {
-        
     }
 }

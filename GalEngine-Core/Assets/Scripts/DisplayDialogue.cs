@@ -93,6 +93,29 @@ public class DisplayDialogue : MonoBehaviour {
 
     private void OnEnable() {
         messageBoxController.OnMessageBoxButtonClick += RaiseOnMessageBoxButtonClick;
+        GameEvents.OnGamingBackgroundChanged += RaiseGamingBackgroundChanged;
+    }
+
+    private void OnDisable() {
+        messageBoxController.OnMessageBoxButtonClick -= RaiseOnMessageBoxButtonClick;
+        GameEvents.OnGamingBackgroundChanged -= RaiseGamingBackgroundChanged;
+    }
+
+    void RaiseGamingBackgroundChanged(Sprite sprite) {
+        StartCoroutine(RaiseGamingBackgroundChangedCoroutine(sprite));
+    }
+
+    IEnumerator RaiseGamingBackgroundChangedCoroutine(Sprite sprite) {
+        CanvasGroup canvasGroup = backgroundImage.GetComponent<CanvasGroup>();
+        if (canvasGroup.alpha != 0) {
+            yield return StartCoroutine(Animation.CanvasFadeOut(canvasGroup, 0.1f));
+        }
+        backgroundImage.sprite = sprite;
+        backgroundImage.GetComponent<AspectRatioFitter>().aspectRatio = sprite.rect.width / sprite.rect.height;
+        yield return null;
+        if (canvasGroup.alpha == 0) {
+            yield return StartCoroutine(Animation.CanvasFadeIn(canvasGroup, 0.1f));
+        }
     }
 
     void RaiseOnMessageBoxButtonClick(Button button) {
@@ -159,29 +182,7 @@ public class DisplayDialogue : MonoBehaviour {
                 string backgroundPath = $"{_packPath}/{jsonData[jsonIndex[0]]["background"]}";
                 if (jsonData[jsonIndex[0]]["background"].ToString() != "NULL") {
                     if (File.Exists(backgroundPath)) {
-                        Sprite background;
-                        try {
-                            background = ExternalResourceLoader.LoadSpriteFromFile(backgroundPath);
-                        } catch (Exception ex) {
-                            Debug.LogError(ex);
-                            background = null;
-                        }
-
-                        yield return null;
-                        if (background != null) {
-                            backgroundImage.sprite = background;
-                            backgroundImage.gameObject.GetComponent<AspectRatioFitter>().aspectRatio =
-                                background.rect.width / background.rect.height;
-                            if (canvasGroup.alpha != 1) {
-                                canvasGroup.alpha = 0;
-                                yield return new WaitForEndOfFrame();
-                                StartCoroutine(Animation.CanvasFadeIn(canvasGroup, 0.1f));
-                            }
-                        } else {
-                            if (canvasGroup.alpha != 0) {
-                                StartCoroutine(Animation.CanvasFadeOut(canvasGroup, 0.1f));
-                            }
-                        }
+                        StartCoroutine(ExternalResourceLoader.LoadGamingBackground(backgroundPath));
                     } else {
                         Debug.LogError($"ERROR: 背景图片{backgroundPath}不存在");
                     }

@@ -1,10 +1,12 @@
 ﻿using System.IO;
 using System;
+using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine.Networking;
 
 public class PathManager {
     public static string GetApplicationRootPath() {
@@ -29,6 +31,31 @@ public class PathManager {
         }
 
         return rootPath;
+    }
+}
+
+public static class LoadedResource {
+    private static Sprite _gamingBackground;
+    private static AudioClip _gamingVoice;
+
+    public static Sprite GamingBackground {
+        get => _gamingBackground;
+        set {
+            if (value != _gamingBackground) {
+                _gamingBackground = value;
+                GameEvents.SendEventOnGamingBackgroundChanged(_gamingBackground);
+            }
+        }
+    }
+
+    public static AudioClip GamingVoice {
+        get => _gamingVoice;
+        set {
+            if (value != _gamingVoice) {
+                _gamingVoice = value;
+                GameEvents.SendEventOnGamingVoiceChanged(_gamingVoice);
+            }
+        }
     }
 }
 
@@ -80,12 +107,27 @@ public class ExternalResourceLoader {
         return config;
     }
 
-    public static Sprite LoadSpriteFromFile(string filePath) {
+    public static IEnumerator LoadGamingBackground(string filePath) {
+        UnityWebRequest www = UnityWebRequestTexture.GetTexture($"file://{filePath}");
+        yield return www.SendWebRequest();
+        if (www.result == UnityWebRequest.Result.Success) {
+            Texture2D texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
+            yield return null;
+            Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
+                new Vector2(0.5f, 0.5f));
+            yield return null;
+            LoadedResource.GamingBackground = sprite;
+        } else {
+            Debug.LogError(www.error);
+        }
+    }
+
+    public static Sprite LoadSpriteFormFile(string filePath) {
         try {
             if (!File.Exists(filePath)) {
                 throw new Exception($"ERROR: 文件{filePath}不存在");
             }
-
+        
             byte[] fileByte = File.ReadAllBytes(filePath);
             Texture2D texture = new(2, 2);
             bool isSuccess = texture.LoadImage(fileByte);
@@ -93,7 +135,7 @@ public class ExternalResourceLoader {
                 Debug.LogError($"无法加载图片: {filePath}");
                 return null;
             }
-
+        
             Sprite sprite = Sprite.Create(
                 texture,
                 new Rect(0, 0, texture.width, texture.height),
@@ -137,7 +179,7 @@ public class ExternalResourceLoader {
                     string data = File.ReadAllText($"{uiPath}/config.json");
                     JObject config = JObject.Parse(data);
                     if (config["image"] != null) {
-                        PageBackground = LoadSpriteFromFile($"{uiPath}/{config["image"]}");
+                        PageBackground = LoadSpriteFormFile($"{uiPath}/{config["image"]}");
                         float width = PageBackground.rect.width;
                         float height = PageBackground.rect.height;
                         BackgroundAspectRatio = width / height;
